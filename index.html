@@ -3,7 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta charset="utf-8">
-<title>Tyler's 2026 Fantasy Draft — v6</title>
+<title>Tyler's 2026 Fantasy Draft — v7</title>
 <style>
 :root{--nav:#102a43;--blue:#2563a8;--green:#2e7d32;--gold:#d6a51f;--bg:#f4f7fb;--card:#fff;--muted:#64748b;--red:#b42318}
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:#172033}
@@ -15,7 +15,7 @@ nav button.active{background:var(--blue);color:white}
 main{padding:14px 12px 90px;max-width:900px;margin:auto}.card{background:var(--card);border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px #0000000d}
 .big{font-size:27px;font-weight:800}.green{color:var(--green)}.muted{color:var(--muted)}
 .pick{border:2px solid #d9e3ef;border-radius:14px;padding:13px;margin:9px 0;background:white}
-.pick.best{border-color:var(--green);background:#f2fbf2}.pickrow{display:flex;align-items:center;gap:10px}.num{font-size:20px;font-weight:800;width:26px}.pname{font-weight:800;font-size:17px;flex:1}.tag{font-size:11px;font-weight:800;padding:4px 7px;border-radius:999px;background:#e8eef6}
+.pick.best{border-color:var(--green);background:#f2fbf2}.pickrow{display:flex;align-items:center;gap:10px}.num{font-size:20px;font-weight:800;width:26px}.pname{font-weight:800;font-size:17px;flex:1}.valuegood{background:#e7f6ea!important;color:#176b2c!important;border-color:#a8d5b0!important}.valuebad{background:#fdecec!important;color:#a51d1d!important;border-color:#efb0b0!important}.valueeven{background:#f1f5f9!important;color:#475569!important;border-color:#cbd5e1!important}.tag{font-size:11px;font-weight:800;padding:4px 7px;border-radius:999px;background:#e8eef6}
 .why{font-size:13px;color:#526276;margin-top:7px;line-height:1.35}
 button.action{border:0;border-radius:10px;padding:10px 12px;font-weight:800;color:white;background:var(--blue);margin-top:9px}button.opp{background:#7a8696}button.undo{background:#9b2c2c}
 .search{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:11px;font-size:16px;margin-bottom:10px}
@@ -151,6 +151,17 @@ function score(p){
   return s;
 }
 function top5(){return available().sort((a,b)=>score(b)-score(a)).slice(0,5)}
+function pickValue(p){
+  const market=Number.isFinite(Number(p.adp)) ? Number(p.adp) : Number(consensusRank(p));
+  if(!Number.isFinite(market)) return null;
+  return state.pick-market;
+}
+function pickValueLabel(p){
+  const v=pickValue(p);
+  if(v===null) return "VALUE N/A";
+  const n=Math.round(v*10)/10;
+  return (n>0?"+":"")+n+" VALUE";
+}
 function draft(p){
   state.status[p.name]="MINE";
   state.mine.push(p);
@@ -262,8 +273,8 @@ function renderPick(app){
   </div>
   <div class="card">
     <div class="sectiontitle">TOP 5 — RIGHT NOW</div>
-    ${picks.map((p,i)=>`<div class="pick ${i===0?"best":""}">
-      <div class="pickrow"><div class="num">${i+1}</div><div class="pname">${p.name}</div><span class="tag">${p.pos}</span><span class="tag">T${p.tier||"?"}</span></div>
+    ${picks.map((p,i)=>{const pv=pickValue(p); const pvClass=pv===null?"":(pv>0?" valuegood":(pv<0?" valuebad":" valueeven")); return `<div class="pick ${i===0?"best":""}">
+      <div class="pickrow"><div class="num">${i+1}</div><div class="pname">${p.name}</div><span class="tag">${p.pos}</span><span class="tag">T${p.tier||"?"}</span><span class="tag${pvClass}">${pickValueLabel(p)}</span></div>
       <div class="why">${why(p,i)}</div>
       ${c.isMine?`<button class="action" data-draft-player="${p.name.replaceAll('"','&quot;')}" type="button">DRAFT ${p.name.toUpperCase()}</button>`:`<button class="action opp" data-opp-player="${p.name.replaceAll('"','&quot;')}" type="button">MARK TAKEN — ${p.name.toUpperCase()}</button>`}
     </div>`).join("")}
