@@ -3,7 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta charset="utf-8">
-<title>Tyler's 2026 Fantasy Draft — v8</title>
+<title>Tyler's 2026 Fantasy Draft — v9</title>
 <style>
 :root{--nav:#102a43;--blue:#2563a8;--green:#2e7d32;--gold:#d6a51f;--bg:#f4f7fb;--card:#fff;--muted:#64748b;--red:#b42318}
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:#172033}
@@ -34,12 +34,12 @@ button.action{border:0;border-radius:10px;padding:10px 12px;font-weight:800;colo
 .undoLast{width:100%;background:#9b2c2c!important;margin-top:0!important}
 
 input,select{font-size:16px}
-.posfilters{display:flex;gap:7px;overflow-x:auto;padding:2px 0 4px;margin:8px 0 2px;-webkit-overflow-scrolling:touch}.posfilters button{flex:0 0 auto;border:0;border-radius:999px;padding:9px 13px;background:#e8eef6;color:#25415f;font-weight:800}.posfilters button.active{background:var(--blue);color:white}.scoreprofile{font-size:12px;color:#526276;background:#f7f9fc;border-radius:10px;padding:9px 10px;margin-top:9px;line-height:1.35}
+.posfilters{display:grid;grid-template-columns:1.35fr repeat(4,1fr);gap:7px;margin:8px 0 10px}.posfilters button{border:2px solid #d4dfeb;border-radius:10px;padding:11px 5px;background:#f5f8fc;color:#25415f;font-weight:900;font-size:13px}.posfilters button.active{background:var(--blue);border-color:var(--blue);color:white;box-shadow:0 2px 5px #0002}.positionhint{font-size:12px;font-weight:800;color:#526276;margin:-2px 0 8px}.scoreprofile{font-size:12px;color:#526276;background:#f7f9fc;border-radius:10px;padding:9px 10px;margin-top:9px;line-height:1.35}
 @media(min-width:700px){nav{top:75px}main{padding-top:20px}.player button{min-width:115px}}
 </style>
 </head>
 <body>
-<header><h1>🏈 Tyler's 2026 Draft — v8</h1><div class="sub">12-team CBS • Full PPR • Pick 1.03 • 0.1/rush attempt</div></header>
+<header><h1>🏈 Tyler's 2026 Draft — v9</h1><div class="sub">12-team CBS • Full PPR • Pick 1.03 • 0.1/rush attempt</div></header>
 <nav>
 <button type="button" id="nPick" class="active" onclick="show('pick')">🎯 Pick</button>
 <button type="button" id="nBoard" onclick="show('board')">📋 Board</button>
@@ -133,14 +133,14 @@ const CBS_SCORING = {
   fieldGoal:3, missedFG:-1, extraPoint:1, missedXP:-2, fumbleLost:-2
 };
 
-// The player pool contains rankings/ADP, not individual projection stat lines.
-// Therefore CBS bonuses are applied as modest position-level scoring-fit modifiers
-// so the custom settings influence value without overpowering consensus/ADP.
+// CBS scoring changes how valuable different player archetypes are.
+// We do not have individual projection stat lines in this app, so we use
+// transparent position-level scoring adjustments rather than fake precision.
 function cbsScoringFit(p){
-  if(p.pos==='WR') return 2.5; // 1 PPR + receiving bonus structure
-  if(p.pos==='RB') return 2.5; // 0.1 per rush + rushing bonus structure
-  if(p.pos==='TE') return 2.0; // full PPR + receiving bonuses
-  if(p.pos==='QB') return 2.0; // 6-pt pass TD + completion bonuses
+  if(p.pos==='RB') return 4.5; // PPR + 0.1/rush attempt + rushing bonuses
+  if(p.pos==='WR') return 4.0; // PPR + receiving bonuses
+  if(p.pos==='TE') return 3.5; // PPR + receiving bonuses + positional scarcity
+  if(p.pos==='QB') return 3.0; // 6-pt pass TD + completion/yardage bonuses
   return 0;
 }
 
@@ -176,16 +176,21 @@ function top5(pos="ALL"){
   const pool=pos==="ALL"?available():available().filter(p=>p.pos===pos);
   return pool.sort((a,b)=>score(b)-score(a)).slice(0,5);
 }
+function adjustedRank(p){
+  // Convert the value score into an easy-to-read draft rank. Higher score = better.
+  const pool=available().slice().sort((a,b)=>score(b)-score(a));
+  const idx=pool.findIndex(x=>x.name===p.name);
+  return idx<0?999:idx+1;
+}
 function pickValue(p){
-  const market=Number.isFinite(Number(p.adp)) ? Number(p.adp) : Number(consensusRank(p));
-  if(!Number.isFinite(market)) return null;
-  return market-state.pick;
+  const r=adjustedRank(p);
+  return Number.isFinite(r)?r-state.pick:null;
 }
 function pickValueLabel(p){
   const v=pickValue(p);
   if(v===null) return "VALUE N/A";
   const n=Math.round(v*10)/10;
-  return (n>0?"+":"")+n+" VALUE";
+  return (n>0?"+":"")+n+" CBS VALUE";
 }
 function draft(p){
   state.status[p.name]="MINE";
@@ -302,11 +307,13 @@ function renderPick(app){
     <button class="action undoLast" type="button" onclick="undoLast()">↩️ UNDO LAST PICK</button>
   </div>
   <div class="card">
-    <div class="sectiontitle">TOP 5 — ${pickPosFilter==="ALL"?"OVERALL":pickPosFilter}</div>
+    <div class="sectiontitle">TOP 5 PICK RECOMMENDATIONS</div>
+    <div class="positionhint">VIEW TOP 5 BY POSITION — tap a position to filter</div>
     <div class="posfilters">
       ${["ALL","WR","RB","QB","TE"].map(pos=>`<button type="button" data-position-filter="${pos}" class="${pickPosFilter===pos?"active":""}">${pos==="ALL"?"OVERALL":pos}</button>`).join("")}
     </div>
-    <div class="scoreprofile"><b>CBS scoring active:</b> Full PPR • 0.1/rush attempt • 6-point passing TD • completion/yardage bonuses • 2-point conversions • fumble lost -2. Ranking remains value-first.</div>
+    <div class="sectiontitle" style="margin-top:4px">${pickPosFilter==="ALL"?"TOP 5 OVERALL":"TOP 5 "+pickPosFilter}</div>
+    <div class="scoreprofile"><b>CBS scoring active:</b> Full PPR • 0.1/rush attempt • 6-point passing TD • completion/yardage bonuses • 2-point conversions • fumble lost -2. The displayed CBS VALUE now uses the app's CBS-adjusted ranking, not raw ADP.</div>
     ${picks.map((p,i)=>{const pv=pickValue(p); const pvClass=pv===null?"":(pv>0?" valuegood":(pv<0?" valuebad":" valueeven")); return `<div class="pick ${i===0?"best":""}">
       <div class="pickrow"><div class="num">${i+1}</div><div class="pname">${p.name}</div><span class="tag">${p.pos}</span><span class="tag">T${p.tier||"?"}</span><span class="tag${pvClass}">${pickValueLabel(p)}</span></div>
       <div class="why">${why(p,i)}</div>
