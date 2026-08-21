@@ -1,0 +1,650 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
+<title>Tyler's 2026 Fantasy Draft — v24</title>
+<style>
+:root{--nav:#102a43;--blue:#2563a8;--green:#2e7d32;--gold:#d6a51f;--bg:#f4f7fb;--card:#fff;--muted:#64748b;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:#172033}
+header{background:var(--nav);color:white;padding:18px 16px calc(14px + env(safe-area-inset-top));position:sticky;top:0;z-index:5}
+h1{font-size:23px;margin:0 0 5px}.sub{font-size:13px;opacity:.85}
+nav{display:flex;gap:8px;padding:10px;background:white;position:sticky;top:76px;z-index:4;box-shadow:0 1px 5px #0001}
+nav button{flex:1;border:0;border-radius:10px;padding:11px 5px;background:#e8eef6;font-weight:700;color:#25415f}
+nav button.active{background:var(--blue);color:white}
+main{padding:14px 12px 90px;max-width:900px;margin:auto}.card{background:var(--card);border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px #0000000d}
+.big{font-size:27px;font-weight:800}.green{color:var(--green)}.muted{color:var(--muted)}
+.pick{border:2px solid #d9e3ef;border-radius:14px;padding:13px;margin:9px 0;background:white}
+.pick.best{border-color:var(--green);background:#f2fbf2}.pickrow{display:flex;align-items:center;gap:10px}.num{font-size:20px;font-weight:800;width:26px}.pname{font-weight:800;font-size:17px;flex:1}.tag{font-size:11px;font-weight:800;padding:4px 7px;border-radius:999px;background:#e8eef6}
+.posTag{border:1px solid transparent}
+.posWR{background:#e7f0ff;color:#1d4ed8;border-color:#b9d2ff}
+.posRB{background:#e9f8ed;color:#15803d;border-color:#b7e4c2}
+.posQB{background:#f1e9ff;color:#7e22ce;border-color:#d8c1ff}
+.posTE{background:#fff1df;color:#c2410c;border-color:#ffd2a1}
+.posK{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
+.posDST{background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe}
+.tierTag{border:1px solid transparent}.tier1{background:#dff7f5;color:#0f766e;border-color:#8bd4ce}.tier2{background:#eee8ff;color:#6d4fc2;border-color:#c7b7f4}.tier3{background:#ededed;color:#555;border-color:#c9c9c9}.tier4{background:#fff0dc;color:#c66a00;border-color:#f5c27a}.tier5{background:#e6f0ff;color:#1d5fa7;border-color:#9fc1ed}.tierNA{background:#f8fafc;color:#64748b;border-color:#cbd5e1}.legendPill{display:inline-block;padding:2px 6px;border-radius:999px;font-weight:900;font-size:10px;margin-left:2px;border:1px solid transparent}
+.why{font-size:13px;color:#526276;margin-top:7px;line-height:1.35}
+button.action{border:0;border-radius:10px;padding:10px 12px;font-weight:800;color:white;background:var(--blue);margin-top:9px}button.opp{background:#7a8696}button.undo{background:#9b2c2c}
+.search{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:11px;font-size:16px;margin-bottom:10px}
+.player{display:flex;align-items:center;gap:8px;border-bottom:1px solid #edf1f5;padding:11px 0}.player:last-child{border-bottom:0}
+.player .info{flex:1}.player .name{font-weight:750}.player small{color:var(--muted)}
+.player button{border:0;border-radius:9px;padding:9px 8px;font-weight:750}.draft{background:#dff2df;color:#1d6a25}.oppbtn{background:#eef1f5;color:#334155}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f0f4f9;border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:20px}.sectiontitle{font-size:17px;font-weight:850;margin:4px 0 10px}
+.toast{position:fixed;left:12px;right:12px;bottom:75px;background:#172033;color:white;padding:13px;border-radius:12px;display:none;z-index:10;text-align:center}
+.clock{border:2px solid var(--blue);background:#eef6ff;border-radius:14px;padding:14px;margin-bottom:12px}
+.clock .label{font-size:12px;font-weight:850;text-transform:uppercase;color:var(--blue);letter-spacing:.5px}
+.clock .team{font-size:25px;font-weight:900;margin-top:3px}
+.clock .detail{font-size:13px;color:#526276;margin-top:5px}
+.orderrow{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #edf1f5}
+.orderrow:last-child{border-bottom:0}.orderrow.current{background:#eef6ff;border-radius:10px;padding-left:8px;padding-right:8px}
+.orderpick{width:34px;font-weight:850;color:#526276}.orderteam{flex:1;font-weight:750}.youbadge{font-size:10px;font-weight:900;background:#dff2df;color:#1d6a25;padding:4px 7px;border-radius:999px}
+.undoLast{width:100%;background:#9b2c2c!important;margin-top:0!important}
+
+input,select{font-size:16px}
+.posfilters{display:grid;grid-template-columns:1.35fr repeat(4,1fr);gap:7px;margin:8px 0 10px}.posfilters button{border:2px solid #d4dfeb;border-radius:10px;padding:11px 5px;background:#f5f8fc;color:#25415f;font-weight:900;font-size:13px}.posfilters button.active{background:var(--blue);border-color:var(--blue);color:white;box-shadow:0 2px 5px #0002}.positionhint{font-size:12px;font-weight:800;color:#526276;margin:-2px 0 8px}.scoreprofile{font-size:12px;color:#526276;background:#f7f9fc;border-radius:10px;padding:9px 10px;margin-top:9px;line-height:1.35}.playerSnapshot{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:9px}.miniStat{background:#f5f8fc;border-radius:9px;padding:7px 6px;text-align:center}.miniStat b{display:block;font-size:13px;color:#172033}.miniStat b.dualValue{font-size:11px;white-space:nowrap}.miniStat span{display:block;font-size:10px;color:#64748b;font-weight:800;margin-top:2px}.valueLabel{display:inline-block;margin-top:8px;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900}.vorpStrong{color:#166534}.vorpNA{color:#64748b}.valueElite{background:#fff4cc;color:#8a5a00;border:1px solid #f0c94a}.valueStrong{background:#dff2df;color:#1d6a25}.valueFair{background:#fff4cc;color:#8a5a00;border:1px solid #f0c94a}.valueReach{background:#fff1e8;color:#9a3412}.vorpDot{display:inline-block;margin-left:2px;font-style:normal;font-size:11px}.vorpElite{color:#166534}.vorpStrong{color:#15803d}.vorpFair{color:#a16207}.vorpLow{color:#dc2626}.valueExplain{font-size:10px;color:#64748b;margin-top:5px;line-height:1.25}.availability{display:flex;align-items:center;gap:7px;margin-top:8px;padding:7px 9px;border-radius:9px;font-size:11px;font-weight:850;background:#f5f8fc}.availability .pct{font-size:15px;font-weight:950}.availHigh{color:#166534;background:#eaf8ee}.availMed{color:#8a5a00;background:#fff7df}.availLow{color:#9a3412;background:#fff0e8}.availTiny{font-size:10px;color:#64748b;font-weight:700;margin-left:auto}.availVeryLow{color:#b91c1c;background:#ffe8e8}.availModel{font-size:10px;color:#64748b;font-weight:700;margin-top:3px}
+@media(min-width:700px){nav{top:75px}main{padding-top:20px}.player button{min-width:115px}}
+</style>
+</head>
+<body>
+<header><h1>🏈 Tyler's 2026 Draft — v24</h1><div class="sub">12-team CBS • Full PPR • Pick 1.03 • 0.1/rush attempt</div></header>
+<nav>
+<button type="button" id="nPick" class="active" onclick="show('pick')">🎯 Pick</button>
+<button type="button" id="nBoard" onclick="show('board')">📋 Board</button>
+<button type="button" id="nTeam" onclick="show('team')">👤 My Team</button>
+<button type="button" id="nLog" onclick="show('log')">📝 Log</button><button type="button" id="nData" onclick="show('data')">📊 Data</button>
+</nav>
+<main id="app"></main>
+<div id="toast" class="toast"></div>
+<script>
+let PLAYERS = [{"name": "Jahmyr Gibbs", "pos": "RB", "team": "DET", "adp": 1.33, "rank": 1, "tier": "1"}, {"name": "Bijan Robinson", "pos": "RB", "team": "ATL", "adp": 1.96, "rank": 2, "tier": "1"}, {"name": "Puka Nacua", "pos": "WR", "team": "LAR", "adp": 4.75, "rank": 4, "tier": "1"}, {"name": "Ja'Marr Chase", "pos": "WR", "team": "CIN", "adp": 3.81, "rank": 3, "tier": "1"}, {"name": "Christian McCaffrey", "pos": "RB", "team": "SF", "adp": 6.59, "rank": 7, "tier": "1"}, {"name": "Jaxon Smith-Njigba", "pos": "WR", "team": "SEA", "adp": 6.44, "rank": 6, "tier": "1"}, {"name": "Amon-Ra St. Brown", "pos": "WR", "team": "DET", "adp": 8.69, "rank": 8, "tier": "1"}, {"name": "Jonathan Taylor", "pos": "RB", "team": "IND", "adp": 5.52, "rank": 5, "tier": "1"}, {"name": "James Cook", "pos": "RB", "team": "BUF", "adp": 11.87, "rank": 10, "tier": "2"}, {"name": "Derrick Henry", "pos": "RB", "team": "BAL", "adp": 18.0, "rank": 18.0, "tier": ""}, {"name": "Drake London", "pos": "WR", "team": "ATL", "adp": 19.0, "rank": 18.0, "tier": ""}, {"name": "Justin Jefferson", "pos": "WR", "team": "MIN", "adp": 11.5, "rank": 8.0, "tier": ""}, {"name": "CeeDee Lamb", "pos": "WR", "team": "DAL", "adp": 9.0, "rank": 7.0, "tier": ""}, {"name": "Saquon Barkley", "pos": "RB", "team": "PHI", "adp": 12.0, "rank": 12.0, "tier": ""}, {"name": "Omarion Hampton", "pos": "RB", "team": "LAC", "adp": 17.0, "rank": 17.0, "tier": ""}, {"name": "Nico Collins", "pos": "WR", "team": "HOU", "adp": 21.5, "rank": 25.0, "tier": ""}, {"name": "Rashee Rice", "pos": "WR", "team": "KC", "adp": 30.5, "rank": 20.0, "tier": ""}, {"name": "Chris Olave", "pos": "WR", "team": "NO", "adp": 32.5, "rank": 22.0, "tier": ""}, {"name": "A.J. Brown", "pos": "WR", "team": "NE", "adp": 21.0, "rank": 24.0, "tier": ""}, {"name": "De'Von Achane", "pos": "RB", "team": "MIA", "adp": 11.32, "rank": 9, "tier": "2"}, {"name": "Kenneth Walker", "pos": "RB", "team": "KC", "adp": 13.5, "rank": 14.0, "tier": ""}, {"name": "Chase Brown", "pos": "RB", "team": "CIN", "adp": 13.55, "rank": 12, "tier": "2"}, {"name": "Brock Bowers", "pos": "TE", "team": "LV", "adp": 20.0, "rank": 21.0, "tier": ""}, {"name": "Ashton Jeanty", "pos": "RB", "team": "LV", "adp": 12.73, "rank": 11, "tier": "2"}, {"name": "Josh Allen", "pos": "QB", "team": "BUF", "adp": 32.5, "rank": 32.5, "tier": ""}, {"name": "George Pickens", "pos": "WR", "team": "DAL", "adp": 22.5, "rank": 19.0, "tier": ""}, {"name": "Kyren Williams", "pos": "RB", "team": "LAR", "adp": 32.0, "rank": 32.0, "tier": ""}, {"name": "Jeremiyah Love", "pos": "RB", "team": "ARI", "adp": 25.5, "rank": 25.5, "tier": ""}, {"name": "Trey McBride", "pos": "TE", "team": "ARI", "adp": 30.5, "rank": 30.5, "tier": ""}, {"name": "Drake Maye", "pos": "QB", "team": "NE", "adp": 63.5, "rank": 63.5, "tier": ""}, {"name": "Lamar Jackson", "pos": "QB", "team": "BAL", "adp": 52.5, "rank": 52.5, "tier": ""}, {"name": "DeVonta Smith", "pos": "WR", "team": "PHI", "adp": 26.0, "rank": 23.0, "tier": ""}, {"name": "Zay Flowers", "pos": "WR", "team": "BAL", "adp": 30.0, "rank": 30.0, "tier": ""}, {"name": "Breece Hall", "pos": "RB", "team": "NYJ", "adp": 27.5, "rank": 27.5, "tier": ""}, {"name": "Garrett Wilson", "pos": "WR", "team": "NYJ", "adp": 41.0, "rank": 41.0, "tier": ""}, {"name": "Jalen Hurts", "pos": "QB", "team": "PHI", "adp": 68.5, "rank": 68.5, "tier": ""}, {"name": "Malik Nabers", "pos": "WR", "team": "NYG", "adp": 24.0, "rank": 24.0, "tier": ""}, {"name": "Jameson Williams", "pos": "WR", "team": "DET", "adp": 53.5, "rank": 53.5, "tier": ""}, {"name": "Cam Skattebo", "pos": "RB", "team": "NYG", "adp": 45.0, "rank": 45.0, "tier": ""}, {"name": "Joe Burrow", "pos": "QB", "team": "CIN", "adp": 65.5, "rank": 65.5, "tier": ""}, {"name": "Colston Loveland", "pos": "TE", "team": "CHI", "adp": 41.5, "rank": 41.5, "tier": ""}, {"name": "Davante Adams", "pos": "WR", "team": "LAR", "adp": 53.5, "rank": 53.5, "tier": ""}, {"name": "Tetairoa McMillan", "pos": "WR", "team": "CAR", "adp": 39.5, "rank": 39.5, "tier": ""}, {"name": "Emeka Egbuka", "pos": "WR", "team": "TB", "adp": 35.0, "rank": 35.0, "tier": ""}, {"name": "Tee Higgins", "pos": "WR", "team": "CIN", "adp": 32.0, "rank": 32.0, "tier": ""}, {"name": "Christian Watson", "pos": "WR", "team": "GB", "adp": 56.0, "rank": 56.0, "tier": ""}, {"name": "Javonte Williams", "pos": "RB", "team": "DAL", "adp": 36.0, "rank": 36.0, "tier": ""}, {"name": "Mike Evans", "pos": "WR", "team": "SF", "adp": 53.5, "rank": 53.5, "tier": ""}, {"name": "Jayden Daniels", "pos": "QB", "team": "WAS", "adp": 65.5, "rank": 65.5, "tier": ""}, {"name": "Josh Jacobs", "pos": "RB", "team": "GB", "adp": 39.0, "rank": 39.0, "tier": ""}, {"name": "Rome Odunze", "pos": "WR", "team": "CHI", "adp": 56.0, "rank": 56.0, "tier": ""}, {"name": "Ladd McConkey", "pos": "WR", "team": "LAC", "adp": 37.5, "rank": 37.5, "tier": ""}, {"name": "Jaylen Waddle", "pos": "WR", "team": "DEN", "adp": 35.5, "rank": 35.5, "tier": ""}, {"name": "D.J. Moore", "pos": "WR", "team": "BUF", "adp": 53.0, "rank": 53.0, "tier": ""}, {"name": "Tyler Warren", "pos": "TE", "team": "IND", "adp": 55.5, "rank": 55.5, "tier": ""}, {"name": "Bucky Irving", "pos": "RB", "team": "TB", "adp": 57.0, "rank": 57.0, "tier": ""}, {"name": "D'Andre Swift", "pos": "RB", "team": "CHI", "adp": 45.5, "rank": 45.5, "tier": ""}, {"name": "Luther Burden III", "pos": "WR", "team": "CHI", "adp": 45.5, "rank": 45.5, "tier": ""}, {"name": "Terry McLaurin", "pos": "WR", "team": "WAS", "adp": 45.5, "rank": 45.5, "tier": ""}, {"name": "DK Metcalf", "pos": "WR", "team": "PIT", "adp": 77.5, "rank": 77.5, "tier": ""}, {"name": "Travis Etienne", "pos": "RB", "team": "NO", "adp": 43.0, "rank": 43.0, "tier": ""}, {"name": "Bhayshul Tuten", "pos": "RB", "team": "JAC", "adp": 53.5, "rank": 53.5, "tier": ""}, {"name": "Marvin Harrison Jr.", "pos": "WR", "team": "ARI", "adp": 67.0, "rank": 67.0, "tier": ""}, {"name": "Quinshon Judkins", "pos": "RB", "team": "CLE", "adp": 52.5, "rank": 52.5, "tier": ""}, {"name": "Alec Pierce", "pos": "WR", "team": "IND", "adp": 90.5, "rank": 90.5, "tier": ""}, {"name": "Harold Fannin Jr.", "pos": "TE", "team": "CLE", "adp": 90.0, "rank": 90.0, "tier": ""}, {"name": "Caleb Williams", "pos": "QB", "team": "CHI", "adp": 73.0, "rank": 73.0, "tier": ""}, {"name": "David Montgomery", "pos": "RB", "team": "HOU", "adp": 48.5, "rank": 48.5, "tier": ""}, {"name": "TreVeyon Henderson", "pos": "RB", "team": "NE", "adp": 60.5, "rank": 60.5, "tier": ""}, {"name": "Michael Pittman Jr.", "pos": "WR", "team": "PIT", "adp": 98.0, "rank": 98.0, "tier": ""}, {"name": "Courtland Sutton", "pos": "WR", "team": "DEN", "adp": 93.5, "rank": 93.5, "tier": ""}, {"name": "Kyle Pitts", "pos": "TE", "team": "ATL", "adp": 93.5, "rank": 93.5, "tier": ""}, {"name": "Jayden Reed", "pos": "WR", "team": "GB", "adp": 91.0, "rank": 91.0, "tier": ""}, {"name": "Jaylen Warren", "pos": "RB", "team": "PIT", "adp": 72.0, "rank": 72.0, "tier": ""}, {"name": "Carnell Tate", "pos": "WR", "team": "TEN", "adp": 66.5, "rank": 66.5, "tier": ""}, {"name": "Tony Pollard", "pos": "RB", "team": "TEN", "adp": 76.0, "rank": 76.0, "tier": ""}, {"name": "Jadarian Price", "pos": "RB", "team": "SEA", "adp": 64.0, "rank": 64.0, "tier": ""}, {"name": "Dak Prescott", "pos": "QB", "team": "DAL", "adp": 81.5, "rank": 81.5, "tier": ""}, {"name": "Jakobi Meyers", "pos": "WR", "team": "JAC", "adp": 117.5, "rank": 117.5, "tier": ""}, {"name": "Sam LaPorta", "pos": "TE", "team": "DET", "adp": 80.0, "rank": 80.0, "tier": ""}, {"name": "Chuba Hubbard", "pos": "RB", "team": "CAR", "adp": 95.0, "rank": 95.0, "tier": ""}, {"name": "Parker Washington", "pos": "WR", "team": "JAC", "adp": 59.5, "rank": 59.5, "tier": ""}, {"name": "Bo Nix", "pos": "QB", "team": "DEN", "adp": 103.0, "rank": 103.0, "tier": ""}, {"name": "Travis Kelce", "pos": "TE", "team": "KC", "adp": 119.5, "rank": 119.5, "tier": ""}, {"name": "Chris Godwin", "pos": "WR", "team": "TB", "adp": 86.5, "rank": 86.5, "tier": ""}, {"name": "Brian Thomas Jr.", "pos": "WR", "team": "JAC", "adp": 67.0, "rank": 67.0, "tier": ""}, {"name": "Wan'Dale Robinson", "pos": "WR", "team": "TEN", "adp": 118.5, "rank": 118.5, "tier": ""}, {"name": "Josh Downs", "pos": "WR", "team": "IND", "adp": 82.0, "rank": 82.0, "tier": ""}, {"name": "Mark Andrews", "pos": "TE", "team": "BAL", "adp": 128.0, "rank": 128.0, "tier": ""}, {"name": "Justin Herbert", "pos": "QB", "team": "LAC", "adp": 79.0, "rank": 79.0, "tier": ""}, {"name": "Brock Purdy", "pos": "QB", "team": "SF", "adp": 97.0, "rank": 97.0, "tier": ""}, {"name": "Rhamondre Stevenson", "pos": "RB", "team": "NE", "adp": 69.5, "rank": 69.5, "tier": ""}, {"name": "J.K. Dobbins", "pos": "RB", "team": "DEN", "adp": 92.0, "rank": 92.0, "tier": ""}, {"name": "Jaxson Dart", "pos": "QB", "team": "NYG", "adp": 100.0, "rank": 100.0, "tier": ""}, {"name": "Rachaad White", "pos": "RB", "team": "WAS", "adp": 112.0, "rank": 112.0, "tier": ""}, {"name": "Rico Dowdle", "pos": "RB", "team": "PIT", "adp": 87.5, "rank": 87.5, "tier": ""}, {"name": "Michael Wilson", "pos": "WR", "team": "ARI", "adp": 90.0, "rank": 90.0, "tier": ""}, {"name": "Xavier Worthy", "pos": "WR", "team": "KC", "adp": 116.0, "rank": 116.0, "tier": ""}, {"name": "Khalil Shakir", "pos": "WR", "team": "BUF", "adp": 137.0, "rank": 137.0, "tier": ""}, {"name": "Romeo Doubs", "pos": "WR", "team": "NE", "adp": 120.5, "rank": 120.5, "tier": ""}, {"name": "Stefon Diggs", "pos": "WR", "team": "WAS", "adp": 94.0, "rank": 94.0, "tier": ""}, {"name": "Jordan Addison", "pos": "WR", "team": "MIN", "adp": 94.0, "rank": 94.0, "tier": ""}, {"name": "Tucker Kraft", "pos": "TE", "team": "GB", "adp": 73.0, "rank": 73.0, "tier": ""}, {"name": "Jordyn Tyson", "pos": "WR", "team": "NO", "adp": 71.5, "rank": 71.5, "tier": ""}, {"name": "Dallas Goedert", "pos": "TE", "team": "PHI", "adp": 128.0, "rank": 128.0, "tier": ""}, {"name": "Quentin Johnston", "pos": "WR", "team": "LAC", "adp": 81.0, "rank": 81.0, "tier": ""}, {"name": "RJ Harvey", "pos": "RB", "team": "DEN", "adp": 94.5, "rank": 94.5, "tier": ""}, {"name": "Jacory Croskey-Merritt", "pos": "RB", "team": "WAS", "adp": 101.0, "rank": 101.0, "tier": ""}, {"name": "Kyle Monangai", "pos": "RB", "team": "CHI", "adp": 101.0, "rank": 101.0, "tier": ""}, {"name": "Blake Corum", "pos": "RB", "team": "LAR", "adp": 93.5, "rank": 93.5, "tier": ""}, {"name": "Aaron Jones", "pos": "RB", "team": "MIN", "adp": 127.5, "rank": 127.5, "tier": ""}, {"name": "Kenneth Gainwell", "pos": "RB", "team": "TB", "adp": 112.5, "rank": 112.5, "tier": ""}, {"name": "Matthew Golden", "pos": "WR", "team": "GB", "adp": 106.5, "rank": 106.5, "tier": ""}, {"name": "George Kittle", "pos": "TE", "team": "SF", "adp": 103.5, "rank": 103.5, "tier": ""}, {"name": "Jared Goff", "pos": "QB", "team": "DET", "adp": 114.5, "rank": 114.5, "tier": ""}, {"name": "KC Concepcion", "pos": "WR", "team": "CLE", "adp": 121.5, "rank": 121.5, "tier": ""}, {"name": "Trevor Lawrence", "pos": "QB", "team": "JAC", "adp": 83.5, "rank": 83.5, "tier": ""}, {"name": "Makai Lemon", "pos": "WR", "team": "PHI", "adp": 93.5, "rank": 93.5, "tier": ""}, {"name": "Jordan Mason", "pos": "RB", "team": "MIN", "adp": 102.0, "rank": 102.0, "tier": ""}, {"name": "Matthew Stafford", "pos": "QB", "team": "LAR", "adp": 109.5, "rank": 109.5, "tier": ""}, {"name": "Patrick Mahomes", "pos": "QB", "team": "KC", "adp": 104.5, "rank": 104.5, "tier": ""}, {"name": "Jonathon Brooks", "pos": "RB", "team": "CAR", "adp": 78.0, "rank": 78.0, "tier": ""}, {"name": "Rashid Shaheed", "pos": "WR", "team": "SEA", "adp": 134.0, "rank": 134.0, "tier": ""}, {"name": "Deebo Samuel", "pos": "WR", "team": "SF", "adp": 132.5, "rank": 132.5, "tier": ""}, {"name": "Tyrone Tracy Jr.", "pos": "RB", "team": "NYG", "adp": 135.0, "rank": 135.0, "tier": ""}, {"name": "Alvin Kamara", "pos": "RB", "team": "NO", "adp": 157.0, "rank": 157.0, "tier": ""}, {"name": "Woody Marks", "pos": "RB", "team": "HOU", "adp": 140.5, "rank": 140.5, "tier": ""}, {"name": "Jerry Jeudy", "pos": "WR", "team": "CLE", "adp": 196.5, "rank": 196.5, "tier": ""}, {"name": "Jake Ferguson", "pos": "TE", "team": "DAL", "adp": 137.0, "rank": 137.0, "tier": ""}, {"name": "Dalton Kincaid", "pos": "TE", "team": "BUF", "adp": 115.5, "rank": 115.5, "tier": ""}, {"name": "Zach Charbonnet", "pos": "RB", "team": "SEA", "adp": 148.0, "rank": 148.0, "tier": ""}, {"name": "Tre Tucker", "pos": "WR", "team": "LV", "adp": 167.0, "rank": 167.0, "tier": ""}, {"name": "Jalen McMillan", "pos": "WR", "team": "TB", "adp": 150.0, "rank": 150.0, "tier": ""}, {"name": "Rashod Bateman", "pos": "WR", "team": "BAL", "adp": 211.0, "rank": 211.0, "tier": ""}, {"name": "Hunter Henry", "pos": "TE", "team": "NE", "adp": 159.0, "rank": 159.0, "tier": ""}, {"name": "Tyler Shough", "pos": "QB", "team": "NO", "adp": 129.5, "rank": 129.5, "tier": ""}, {"name": "Jayden Higgins", "pos": "WR", "team": "HOU", "adp": 120.5, "rank": 120.5, "tier": ""}, {"name": "Jalen Coker", "pos": "WR", "team": "CAR", "adp": 121.5, "rank": 121.5, "tier": ""}, {"name": "De'Zhaun Stribling", "pos": "WR", "team": "SF", "adp": 123.5, "rank": 123.5, "tier": ""}, {"name": "Kyler Murray", "pos": "QB", "team": "MIN", "adp": 111.0, "rank": 111.0, "tier": ""}, {"name": "Calvin Ridley", "pos": "WR", "team": "TEN", "adp": 209.0, "rank": 209.0, "tier": ""}, {"name": "Isaiah Likely", "pos": "TE", "team": "NYG", "adp": 123.5, "rank": 123.5, "tier": ""}, {"name": "Chris Rodriguez Jr.", "pos": "RB", "team": "JAC", "adp": 119.5, "rank": 119.5, "tier": ""}, {"name": "Dalton Schultz", "pos": "TE", "team": "HOU", "adp": 188.5, "rank": 188.5, "tier": ""}, {"name": "Tyjae Spears", "pos": "RB", "team": "TEN", "adp": 150.5, "rank": 150.5, "tier": ""}, {"name": "Juwan Johnson", "pos": "TE", "team": "NO", "adp": 150.5, "rank": 150.5, "tier": ""}, {"name": "Malik Willis", "pos": "QB", "team": "MIA", "adp": 133.5, "rank": 133.5, "tier": ""}, {"name": "Adonai Mitchell", "pos": "WR", "team": "NYJ", "adp": 160.5, "rank": 160.5, "tier": ""}, {"name": "Germie Bernard", "pos": "WR", "team": "PIT", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Omar Cooper Jr.", "pos": "WR", "team": "NYJ", "adp": 169.5, "rank": 169.5, "tier": ""}, {"name": "Jalen Nailor", "pos": "WR", "team": "LV", "adp": 147.5, "rank": 147.5, "tier": ""}, {"name": "Malik Washington", "pos": "WR", "team": "MIA", "adp": 185.5, "rank": 185.5, "tier": ""}, {"name": "Dylan Sampson", "pos": "RB", "team": "CLE", "adp": 169.0, "rank": 169.0, "tier": ""}, {"name": "Ryan Flournoy", "pos": "WR", "team": "DAL", "adp": 164.5, "rank": 164.5, "tier": ""}, {"name": "Isiah Pacheco", "pos": "RB", "team": "DET", "adp": 167.5, "rank": 167.5, "tier": ""}, {"name": "Pat Freiermuth", "pos": "TE", "team": "PIT", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Tank Bigsby", "pos": "RB", "team": "PHI", "adp": 143.0, "rank": 143.0, "tier": ""}, {"name": "Ty Johnson", "pos": "RB", "team": "BUF", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Greg Dulcich", "pos": "TE", "team": "MIA", "adp": 184.5, "rank": 184.5, "tier": ""}, {"name": "Brenton Strange", "pos": "TE", "team": "JAC", "adp": 156.0, "rank": 156.0, "tier": ""}, {"name": "Brian Robinson Jr.", "pos": "RB", "team": "ATL", "adp": 169.5, "rank": 169.5, "tier": ""}, {"name": "Sam Darnold", "pos": "QB", "team": "SEA", "adp": 148.5, "rank": 148.5, "tier": ""}, {"name": "Baker Mayfield", "pos": "QB", "team": "TB", "adp": 127.0, "rank": 127.0, "tier": ""}, {"name": "Jordan Love", "pos": "QB", "team": "GB", "adp": 124.0, "rank": 124.0, "tier": ""}, {"name": "Tyler Allgeier", "pos": "RB", "team": "ARI", "adp": 144.5, "rank": 144.5, "tier": ""}, {"name": "Justice Hill", "pos": "RB", "team": "BAL", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Jauan Jennings", "pos": "WR", "team": "MIN", "adp": 180.0, "rank": 180.0, "tier": ""}, {"name": "Denzel Boston", "pos": "WR", "team": "CLE", "adp": 141.0, "rank": 141.0, "tier": ""}, {"name": "Caleb Douglas", "pos": "WR", "team": "MIA", "adp": 217.5, "rank": 217.5, "tier": ""}, {"name": "Antonio Williams", "pos": "WR", "team": "WAS", "adp": 217.5, "rank": 217.5, "tier": ""}, {"name": "Keaton Mitchell", "pos": "RB", "team": "LAC", "adp": 130.5, "rank": 130.5, "tier": ""}, {"name": "Isaac TeSlaa", "pos": "WR", "team": "DET", "adp": 188.0, "rank": 188.0, "tier": ""}, {"name": "Travis Hunter", "pos": "WR", "team": "JAC", "adp": 145.5, "rank": 145.5, "tier": ""}, {"name": "Xavier Legette", "pos": "WR", "team": "CAR", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Cooper Kupp", "pos": "WR", "team": "SEA", "adp": 221.5, "rank": 221.5, "tier": ""}, {"name": "Braelon Allen", "pos": "RB", "team": "NYJ", "adp": 206.0, "rank": 206.0, "tier": ""}, {"name": "Ray Davis", "pos": "RB", "team": "BUF", "adp": 179.0, "rank": 179.0, "tier": ""}, {"name": "Darius Slayton", "pos": "WR", "team": "NYG", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Tre Harris", "pos": "WR", "team": "LAC", "adp": 172.5, "rank": 172.5, "tier": ""}, {"name": "MarShawn Lloyd", "pos": "RB", "team": "GB", "adp": 160.0, "rank": 160.0, "tier": ""}, {"name": "Tyquan Thornton", "pos": "WR", "team": "KC", "adp": 223.0, "rank": 223.0, "tier": ""}, {"name": "Mike Washington Jr.", "pos": "RB", "team": "LV", "adp": 180.5, "rank": 180.5, "tier": ""}, {"name": "KaVontae Turpin", "pos": "WR", "team": "DAL", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Pat Bryant", "pos": "WR", "team": "DEN", "adp": 178.0, "rank": 178.0, "tier": ""}, {"name": "Kimani Vidal", "pos": "RB", "team": "LAC", "adp": 218.5, "rank": 218.5, "tier": ""}, {"name": "Denver Broncos", "pos": "DST", "team": "DEN", "adp": 160.0, "rank": 160.0, "tier": ""}, {"name": "Houston Texans", "pos": "DST", "team": "HOU", "adp": 151.0, "rank": 151.0, "tier": ""}, {"name": "Sean Tucker", "pos": "RB", "team": "TB", "adp": 211.5, "rank": 211.5, "tier": ""}, {"name": "T.J. Hockenson", "pos": "TE", "team": "MIN", "adp": 182.0, "rank": 182.0, "tier": ""}, {"name": "Chigoziem Okonkwo", "pos": "TE", "team": "WAS", "adp": 144.5, "rank": 144.5, "tier": ""}, {"name": "Jaydon Blue", "pos": "RB", "team": "DAL", "adp": 169.0, "rank": 169.0, "tier": ""}, {"name": "Seattle Seahawks", "pos": "DST", "team": "SEA", "adp": 162.0, "rank": 162.0, "tier": ""}, {"name": "Brandon Aubrey", "pos": "K", "team": "DAL", "adp": 166.0, "rank": 166.0, "tier": ""}, {"name": "Samaje Perine", "pos": "RB", "team": "CIN", "adp": 0.0, "rank": 999, "tier": ""}, {"name": "Cameron Dicker", "pos": "K", "team": "LAC", "adp": 183.0, "rank": 183.0, "tier": ""}, {"name": "Oronde Gadsden", "pos": "TE", "team": "LAC", "adp": 170.5, "rank": 170.5, "tier": ""}, {"name": "Minnesota Vikings", "pos": "DST", "team": "MIN", "adp": 179.0, "rank": 179.0, "tier": ""}, {"name": "Jaylin Noel", "pos": "WR", "team": "HOU", "adp": 225.5, "rank": 225.5, "tier": ""}, {"name": "Kayshon Boutte", "pos": "WR", "team": "NE", "adp": 205.0, "rank": 205.0, "tier": ""}, {"name": "George Holani", "pos": "RB", "team": "SEA", "adp": 207.0, "rank": 207.0, "tier": ""}]; let SNAPSHOT = {
+  asOf: "August 20, 2026",
+  format: "12-team PPR",
+  consensus: "FantasyPros PPR ADP composite cross-check",
+  market: "Fantasy Football Calculator 12-team PPR",
+  sources: "ESPN • CBS • RTSports • Fantrax • Sleeper via FantasyPros; FFC 12-team PPR market check",
+  note: "V21 uses a unique ordered consensus rank built from the embedded consensus data plus market/ADP cross-checks. It never uses CBS scoring to override the value-first ranking.",
+  refreshed: "Embedded snapshot"
+};
+let DATA_STATUS = "Loading latest.json…";
+
+function normalizeIncoming(payload){
+  const rows=Array.isArray(payload)?payload:(payload?.players||payload?.data||payload?.rankings||[]);
+  if(!Array.isArray(rows)) return [];
+  return rows.map(x=>{
+    if(typeof x==='string') return null;
+    const name=x.name||x.player||x.Player;
+    if(!name) return null;
+    const adp=Number(x.adp ?? x.ADPorOverallADP ?? x.averageDraftPosition);
+    const rank=Number(x.rank ?? x.consensusRank ?? x.marketRank ?? x.overallRank ?? x.myRank);
+    const adpStdDev=Number(x.adpStdDev ?? x.stdDev ?? x.standardDeviation ?? x["Std Dev"]); const high=Number(x.high ?? x.maxPick ?? x.highPick); const low=Number(x.low ?? x.minPick ?? x.lowPick); return {name, pos:x.pos||x.position||"", team:x.team||x.nflTeam||"", bye:x.bye??x.byeWeek, adp:Number.isFinite(adp)?adp:undefined, rank:Number.isFinite(rank)?rank:undefined, tier:x.tier??"", adpStdDev:Number.isFinite(adpStdDev)?adpStdDev:undefined, high:Number.isFinite(high)?high:undefined, low:Number.isFinite(low)?low:undefined, espnAdp:x.espnAdp, cbsAdp:x.cbsAdp, yahooAdp:x.yahooAdp, ffcAdp:x.ffcAdp, sources:x.sources};
+  }).filter(Boolean);
+}
+
+function applyLatest(payload){
+  const incoming=normalizeIncoming(payload);
+  if(!incoming.length) throw new Error("latest.json contained no player records");
+  const byName=new Map(PLAYERS.map(p=>[p.name,p]));
+  incoming.forEach(x=>{
+    const old=byName.get(x.name)||{};
+    byName.set(x.name,{...old,...Object.fromEntries(Object.entries(x).filter(([k,v])=>v!==undefined&&v!==null&&v!==""))});
+  });
+  PLAYERS=Array.from(byName.values());
+  CONSENSUS_RANK_MAP=null;
+  if(payload && !Array.isArray(payload)){
+    SNAPSHOT={...SNAPSHOT,...(payload.snapshot||{}),asOf:payload.asOf||payload.updated||payload.updatedAt||SNAPSHOT.asOf,sources:payload.sources||SNAPSHOT.sources,refreshed:new Date().toLocaleString()};
+  } else SNAPSHOT.refreshed=new Date().toLocaleString();
+  DATA_STATUS="Latest snapshot loaded: "+SNAPSHOT.refreshed;
+}
+
+function normalizeAthletic(payload){
+  const rows=Array.isArray(payload)?payload:(payload?.players||payload?.data||payload?.rankings||[]);
+  if(!Array.isArray(rows)) return [];
+  return rows.map(x=>{
+    if(typeof x!=="object"||!x) return null;
+    const name=x.name||x.player||x.Player||x["OVERALL PLAYER"];
+    if(!name) return null;
+    const vorpRaw=x.vorp ?? x.VORP ?? x["VORP"];
+    const vorp=Number(vorpRaw);
+    return {name:String(name).trim(), vorp:Number.isFinite(vorp)?vorp:undefined, athleticOverall:x.overall_rank??x.overallRank??x["OVERALL RK"], athleticPosRank:x.pos_rank??x.posRank??x["POS RK"]};
+  }).filter(Boolean);
+}
+
+function applyAthletic(payload){
+  const incoming=normalizeAthletic(payload);
+  if(!incoming.length) throw new Error("athletic_latest.json contained no player records");
+  const norm=n=>String(n||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const byName=new Map(PLAYERS.map(p=>[norm(p.name),p]));
+  incoming.forEach(x=>{
+    const p=byName.get(norm(x.name));
+    if(p){
+      if(x.vorp!==undefined) p.vorp=x.vorp;
+      if(x.athleticOverall!==undefined) p.athleticOverall=x.athleticOverall;
+      if(x.athleticPosRank!==undefined) p.athleticPosRank=x.athleticPosRank;
+    }
+  });
+  return incoming.length;
+}
+
+async function refreshData(silent=false){
+  const btn=document.getElementById("refreshDataBtn");
+  if(btn){btn.disabled=true;btn.textContent="⏳ REFRESHING…";}
+  DATA_STATUS="Refreshing player data + The Athletic VORP…";
+  let latestOK=false, athleticOK=false;
+  try{
+    const r=await fetch("./latest.json?ts="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("latest HTTP "+r.status);
+    const payload=await r.json();
+    applyLatest(payload);
+    latestOK=true;
+  }catch(e){}
+  try{
+    const r2=await fetch("./athletic_latest.json?ts="+Date.now(),{cache:"no-store"});
+    if(!r2.ok) throw new Error("Athletic HTTP "+r2.status);
+    const payload2=await r2.json();
+    applyAthletic(payload2);
+    athleticOK=true;
+  }catch(e){}
+  if(latestOK && athleticOK) DATA_STATUS="Live market data + The Athletic VORP loaded";
+  else if(latestOK) DATA_STATUS="Live market data loaded • The Athletic VORP unavailable";
+  else if(athleticOK) DATA_STATUS="The Athletic VORP loaded • market refresh unavailable";
+  else DATA_STATUS="Refresh unavailable — using saved data";
+  if(!silent) toast(athleticOK ? "Player data + VORP refreshed" : "Player data refreshed; VORP unavailable");
+  if(document.getElementById("app")) render(document.querySelector("nav button.active")?.id?.replace(/^n/,"").toLowerCase()||"data");
+  if(btn){btn.disabled=false;btn.textContent="🔄 REFRESH PLAYER DATA";}
+}
+
+const KEY="tylerFantasyDraft2026_v24";
+const OLDKEYS=["tylerFantasyDraft2026_v23","tylerFantasyDraft2026_v22","tylerFantasyDraft2026_v21","tylerFantasyDraft2026_v20","tylerFantasyDraft2026_v19","tylerFantasyDraft2026_v15","tylerFantasyDraft2026_v6","tylerFantasyDraft2026_v4","tylerFantasyDraft2026_v3"];
+const TEAMS=["Purple Reign","The One Who Knocks","WX OIL","Niner Time","Palm Tree Punters","The Great White North","Fix it Ffej","Team Barney","Pocatello Potato Heads","Kittle Big Town","The Widow Maker","True Blue"];
+const MY_TEAM="WX OIL";
+function loadState(){
+  const raw=localStorage.getItem(KEY)||OLDKEYS.map(k=>localStorage.getItem(k)).find(Boolean);
+  if(raw){try{
+    const st=JSON.parse(raw);
+    // V5 starts at pick 1 when no picks have been logged; existing test drafts are preserved.
+    if(!st.log || st.log.length===0) st.pick=1;
+    return st;
+  }catch(e){}}
+  return {status:{},mine:[],log:[],pick:1};
+}
+let state=loadState();
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render(currentTab)}
+function posCount(p){return state.mine.filter(x=>x.pos===p).length}
+function targets(){return {QB:2,RB:5,WR:6,TE:1,PK:1,TD:1}}
+function available(){return PLAYERS.filter(p=>(state.status[p.name]||"AVAILABLE")==="AVAILABLE")}
+const FFC_RANKS = {
+"Bijan Robinson":1,"Jahmyr Gibbs":2,"Puka Nacua":3,"Ja'Marr Chase":4,"Jaxon Smith-Njigba":5,"Amon-Ra St. Brown":6,"Christian McCaffrey":7,"Jonathan Taylor":8,"Drake London":9,"De'Von Achane":10,"CeeDee Lamb":11,"Justin Jefferson":12,"James Cook":13,"Chase Brown":14,"Rashee Rice":15,"Ashton Jeanty":16,"Derrick Henry":17,"A.J. Brown":18,"George Pickens":19,"Saquon Barkley":20,"Nico Collins":21,"Chris Olave":22,"Omarion Hampton":23,"Kenneth Walker":24,"Zay Flowers":25,"Garrett Wilson":26,"Malik Nabers":27,"DeVonta Smith":28,"Trey McBride":29,"Jeremiyah Love":30,"Breece Hall":31,"Josh Jacobs":32,"Kyren Williams":33,"Josh Allen":34,"Tetairoa McMillan":35,"Cam Skattebo":36,"Tee Higgins":37,"Brock Bowers":38,"Emeka Egbuka":39,"Javonte Williams":40,"Ladd McConkey":41,"Davante Adams":42,"Travis Etienne":43,"Jameson Williams":44,"Jaylen Waddle":45,"Bucky Irving":46,"D'Andre Swift":47,"Terry McLaurin":48,"Rome Odunze":49,"DJ Moore":50,"Drake Maye":51,"Quinshon Judkins":52,"Mike Evans":53,"Bhayshul Tuten":54,"Joe Burrow":55,"Colston Loveland":56,"Lamar Jackson":57,"David Montgomery":58,"Christian Watson":59,"Alec Pierce":60,"Luther Burden III":61,"TreVeyon Henderson":62,"Courtland Sutton":63,"Jaylen Warren":64,"Tyler Warren":65,"DK Metcalf":66,"Parker Washington":67,"Dak Prescott":68,"Marvin Harrison Jr.":69,"Tony Pollard":70,"Rhamondre Stevenson":71,"Brian Thomas Jr.":72,"Jayden Daniels":73,"Carnell Tate":74,"Michael Pittman Jr.":75,"Chuba Hubbard":76,"Rico Dowdle":77,"Kyle Pitts":78,"Michael Wilson":79,"Matthew Stafford":80,"Harold Fannin Jr.":81,"Jalen Hurts":82,"Chris Godwin":83,"Josh Downs":84,"Seattle Seahawks":85,"Jadarian Price":86,"RJ Harvey":87,"Wan'Dale Robinson":88,"Sam LaPorta":89,"Denver Broncos":90,"Caleb Williams":91,"Jakobi Meyers":92,"Brock Purdy":93,"Kenneth Gainwell":94,"Quentin Johnston":95,"Stefon Diggs":96,"Jayden Reed":97,"Trevor Lawrence":98,"Keon Coleman":99,"Houston Texans":100
+};
+function marketRank(p){ return FFC_RANKS[p.name] || p.rank || p.adp || 999; }
+let CONSENSUS_RANK_MAP=null;
+function consensusScore(p){
+  const a=Number(p.rank);
+  const b=Number(FFC_RANKS[p.name]);
+  const adp=Number(p.adp);
+  const hasA=Number.isFinite(a)&&a>0&&a<900;
+  const hasB=Number.isFinite(b)&&b>0&&b<900;
+  const hasADP=Number.isFinite(adp)&&adp>0;
+  if(hasA&&hasB) return (a*0.55)+(b*0.45);
+  if(hasA) return a;
+  if(hasB) return b;
+  if(hasADP) return adp;
+  return 999;
+}
+function rebuildConsensusRanks(){
+  CONSENSUS_RANK_MAP=new Map();
+  const ordered=PLAYERS.slice().sort((a,b)=>{
+    const ds=consensusScore(a)-consensusScore(b);
+    if(Math.abs(ds)>0.000001) return ds;
+    const da=(Number(a.adp)>0&&Number.isFinite(Number(a.adp)))?Number(a.adp):999;
+    const db=(Number(b.adp)>0&&Number.isFinite(Number(b.adp)))?Number(b.adp):999;
+    if(da!==db) return da-db;
+    return a.name.localeCompare(b.name);
+  });
+  ordered.forEach((p,i)=>CONSENSUS_RANK_MAP.set(p.name,i+1));
+}
+function consensusRank(p){
+  if(!CONSENSUS_RANK_MAP) rebuildConsensusRanks();
+  return CONSENSUS_RANK_MAP.get(p.name)||999;
+}
+function score(p){
+  const cr=consensusRank(p);
+  const pick=Number(state.pick)||1;
+  const adp=Number(p.adp);
+
+  // CURRENT-PICK VALUE is now the primary recommendation signal.
+  // Positive draft value means the player is falling below his market;
+  // negative means you are paying a premium at this exact pick.
+  const consensusValue=pick-cr;
+  const adpValue=Number.isFinite(adp)&&adp>0 ? pick-adp : consensusValue;
+  const draftValue=(consensusValue*0.55)+(adpValue*0.45);
+
+  // Consensus still matters, but as a quality check rather than the driver.
+  // Normalize rank so #1 is best and later ranks contribute less.
+  const consensusQuality=Math.max(0,1-((cr-1)/59));
+  let s=draftValue*4.5;
+  s += consensusQuality*8;
+
+  // Athletic VORP is a meaningful second opinion.
+  const vorp=Number(p.vorp);
+  if(Number.isFinite(vorp)){
+    const vorps=PLAYERS
+      .filter(x=>Number.isFinite(Number(x.vorp)))
+      .map(x=>Number(x.vorp))
+      .sort((a,b)=>a-b);
+    if(vorps.length){
+      const pct=vorps.filter(v=>v<=vorp).length/vorps.length;
+      s += (pct-0.5)*7;
+    }
+  }
+
+  // Slight WR preference, but never enough to override a meaningful value gap.
+  if(p.pos==="WR") s+=2.5;
+  if(p.pos==="RB") s+=2;
+  if(p.pos==="TE") s+=1;
+
+  // Roster fit remains a tie-breaker rather than a positional quota.
+  let t=targets()[p.pos]||0, c=posCount(p.pos);
+  if(t && c>=t) s-=8;
+  if(p.pos==="QB" && c>=1) s-=2;
+
+  // The Athletic positional tier is supporting evidence only.
+  // Tiers are derived from The Athletic POS. PROJ. bands shown in the
+  // supplied screenshots, with Athletic positional rank as the anchor.
+  const at=athleticTier(p);
+  if(at===1) s+=3;
+  if(at===2) s+=1.5;
+  if(at===4) s-=0.75;
+  if(at===5) s-=1.25;
+
+  return s;
+}
+let pickPosFilter="ALL";
+function top5(pos="ALL"){
+  const pool=pos==="ALL"?available():available().filter(p=>p.pos===pos);
+  return pool.sort((a,b)=>score(b)-score(a)).slice(0,5);
+}
+function draft(p){
+  state.status[p.name]="MINE";
+  state.mine.push(p);
+  state.log.push({pick:state.pick,team:MY_TEAM,player:p.name,pos:p.pos});
+  state.pick++;
+  toast(p.name+" added to "+MY_TEAM);
+  save();
+}
+function opp(p){
+  const team=currentTeam();
+  state.status[p.name]="TAKEN";
+  state.log.push({pick:state.pick,team:team,player:p.name,pos:p.pos});
+  state.pick++;
+  toast(p.name+" marked taken by "+team);
+  save();
+}
+function undo(p){
+  let idx=state.mine.findIndex(x=>x.name===p.name);
+  if(idx>=0) state.mine.splice(idx,1);
+  state.status[p.name]="AVAILABLE";
+  let li=state.log.map(x=>x.player).lastIndexOf(p.name);
+  if(li>=0) state.log.splice(li,1);
+  state.pick=Math.max(1,state.pick-1);
+  save();
+}
+function undoLast(){
+  if(!state.log.length){toast("Nothing to undo");return}
+  const last=state.log[state.log.length-1];
+  const p=PLAYERS.find(x=>x.name===last.player);
+  if(p){
+    state.status[p.name]="AVAILABLE";
+    if(last.team===MY_TEAM){
+      const idx=state.mine.findIndex(x=>x.name===p.name);
+      if(idx>=0) state.mine.splice(idx,1);
+    }
+  }
+  state.log.pop();
+  state.pick=Math.max(1,state.pick-1);
+  toast("Undid pick "+last.pick+": "+last.player);
+  save();
+}
+function roundForPick(pick){return Math.floor((pick-1)/12)+1}
+function slotForPick(pick){
+  const offset=(pick-1)%12;
+  return roundForPick(pick)%2===1 ? offset+1 : 12-offset;
+}
+function currentTeam(){
+  return TEAMS[slotForPick(state.pick)-1];
+}
+function currentClock(){
+  const r=roundForPick(state.pick), slot=slotForPick(state.pick);
+  return {round:r,slot:slot,team:TEAMS[slot-1],isMine:TEAMS[slot-1]===MY_TEAM};
+}
+function pickLabel(pick){return "Pick "+pick+" • Round "+roundForPick(pick)}
+let currentTab="pick";
+function show(tab){
+ currentTab=tab;
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ document.getElementById("n"+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add("active");
+ render(tab);
+}
+function render(tab="pick"){
+ const app=document.getElementById("app");
+ if(tab==="pick") renderPick(app);
+ if(tab==="board") renderBoard(app);
+ if(tab==="team") renderTeam(app);
+ if(tab==="log") renderLog(app); if(tab==="data") renderData(app);
+}
+function playerButtons(p){
+  const mine=currentTeam()===MY_TEAM;
+  return `<div class="player">
+    <div class="info">
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+        <div class="name">${p.name}</div>
+        <span class="tag posTag ${positionClass(p.pos)}">${p.pos}</span>
+      </div>
+      <small>${p.team} • ADP ${p.adp??"—"} • Consensus ${consensusRank(p)}</small>
+    </div>
+    ${mine?`<button class="draft" data-draft-player="${p.name.replaceAll('"','&quot;')}" type="button">I DRAFTED</button>`:`<button class="oppbtn" data-opp-player="${p.name.replaceAll('"','&quot;')}" type="button">TAKEN</button>`}
+  </div>`;
+}
+function draftByName(n){let p=PLAYERS.find(x=>x.name===n);if(p)draft(p)}
+function oppByName(n){let p=PLAYERS.find(x=>x.name===n);if(p)opp(p)}
+// iPad/Safari-safe button handling: use event delegation instead of inline draft handlers.
+document.addEventListener("click", function(e){
+  const b=e.target.closest("button[data-draft-player],button[data-opp-player],button[data-undo-player],button[data-position-filter]");
+  if(!b) return;
+  if(b.dataset.positionFilter){
+    pickPosFilter=b.dataset.positionFilter;
+    render("pick");
+    return;
+  }
+  const n=b.dataset.draftPlayer || b.dataset.oppPlayer || b.dataset.undoPlayer;
+  const p=PLAYERS.find(x=>x.name===n);
+  if(!p) return;
+  if(b.dataset.draftPlayer) draft(p);
+  else if(b.dataset.oppPlayer) opp(p);
+  else undo(p);
+});
+function renderPick(app){
+  const picks=top5(pickPosFilter), t=targets(), c=currentClock();
+  app.innerHTML=`
+  <div class="clock">
+    <div class="label">${c.isMine?"🎯 YOUR PICK":"⏱️ ON THE CLOCK"}</div>
+    <div class="team">${c.team}</div>
+    <div class="detail">Pick ${state.pick} • Round ${c.round} • Draft slot ${c.slot}${c.isMine?" • This is you":""}</div>
+  </div>
+  <div class="card">
+    <div class="grid">
+      <div class="stat"><b>${state.mine.length}</b>Rostered</div>
+      <div class="stat"><b>${available().length}</b>Available</div>
+      <div class="stat"><b>${state.log.length}</b>Picks logged</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sectiontitle">DRAFT ORDER — CURRENT PICK</div>
+    ${TEAMS.map((team,i)=>`<div class="orderrow ${i===c.slot-1?"current":""}">
+      <div class="orderpick">${i+1}</div><div class="orderteam">${team}</div>${team===MY_TEAM?'<span class="youbadge">YOU</span>':""}
+    </div>`).join("")}
+    <div class="why">Order reverses in even-numbered rounds.</div>
+  </div>
+  <div class="card">
+    <button class="action undoLast" type="button" onclick="undoLast()">↩️ UNDO LAST PICK</button>
+  </div>
+  <div class="card">
+    <div class="sectiontitle">TOP 5 PICK RECOMMENDATIONS</div>
+    <div class="positionhint">VIEW TOP 5 BY POSITION — tap a position to filter</div>
+    <div class="posfilters">
+      ${["ALL","WR","RB","QB","TE"].map(pos=>`<button type="button" data-position-filter="${pos}" class="${pickPosFilter===pos?"active":""}">${pos==="ALL"?"OVERALL":pos}</button>`).join("")}
+    </div>
+    <div class="sectiontitle" style="margin-top:4px">${pickPosFilter==="ALL"?"TOP 5 OVERALL":"TOP 5 "+pickPosFilter}</div>
+    <div class="scoreprofile"><b>VALUE-FIRST ENGINE:</b> current-pick value is the primary recommendation signal, with consensus rank, Athletic VORP, ADP, Athletic positional tier, and roster fit acting as supporting evidence. A player who falls below consensus/ADP can move decisively ahead of a higher-ranked player who is being drafted at a premium. CBS scoring remains league context and does <b>not</b> override the ranking. Consensus ranks are unique and ordered. Draft Value is recalculated at the live pick for whoever is on the clock; positive means value, negative means a premium.<br><b>ATHLETIC TIERS:</b> <span class="legendPill tier1">T1</span> <span class="legendPill tier2">T2</span> <span class="legendPill tier3">T3</span> <span class="legendPill tier4">T4</span> <span class="legendPill tier5">T5</span> — based on the positional projection bands in your Athletic screenshots.</div>
+    ${picks.map((p,i)=>{ return `<div class="pick ${i===0?"best":""}">
+      <div class="pickrow"><div class="num">${i+1}</div><div class="pname">${p.name}</div><span class="tag posTag ${positionClass(p.pos)}">${p.pos}</span><span class="tag tierTag ${tierClass(athleticTier(p))}">${tierLabel(p)}</span></div>
+      <div class="why">${why(p,i)}</div>
+      ${playerSnapshot(p)}
+      ${c.isMine?`<button class="action" data-draft-player="${p.name.replaceAll('"','&quot;')}" type="button">DRAFT ${p.name.toUpperCase()}</button>`:`<button class="action opp" data-opp-player="${p.name.replaceAll('"','&quot;')}" type="button">MARK TAKEN — ${p.name.toUpperCase()}</button>`}
+    </div>`}).join("")}
+  </div>
+  <div class="card">
+    <div class="sectiontitle">POSITION CHECK — MY TEAM</div>
+    ${Object.keys(t).map(pos=>`<span class="tag" style="display:inline-block;margin:3px">${pos}: ${posCount(pos)}/${t[pos]}</span>`).join("")}
+  </div>
+  <div class="card">
+  <div class="sectiontitle">📊 PLAYER DATA / CONSENSUS</div>
+  <div class="grid">
+    <div class="stat"><b>${SNAPSHOT.format}</b>Format</div>
+    <div class="stat"><b>${SNAPSHOT.asOf}</b>Data date</div>
+    <div class="stat"><b>2</b>Market checks</div>
+  </div>
+  <div class="why"><b>Consensus engine:</b> ${SNAPSHOT.consensus}. <b>Market check:</b> ${SNAPSHOT.market}.</div><div class="why"><b>Status:</b> ${DATA_STATUS}</div>
+  <div class="why">${SNAPSHOT.sources}</div>
+  <div class="why">${SNAPSHOT.note}</div>
+</div>`;
+}
+function positionalRank(p){
+  const pool=PLAYERS.filter(x=>x.pos===p.pos).sort((a,b)=>consensusRank(a)-consensusRank(b));
+  return pool.findIndex(x=>x.name===p.name)+1;
+}
+function draftValue(p){
+  const pick=Number(state.pick)||1;
+  const cr=consensusRank(p);
+  const adp=Number(p.adp);
+  const consensusValue=pick-cr;
+  const adpValue=Number.isFinite(adp)&&adp>0 ? pick-adp : null;
+
+  // Positive = the player is falling past his market.
+  // Negative = you are paying a premium to take him at this pick.
+  const value=adpValue===null
+    ? consensusValue
+    : (consensusValue*0.55)+(adpValue*0.45);
+
+  return {pick,cr,adp,consensusValue,adpValue,value};
+}
+
+function valueAssessment(p){
+  const v=draftValue(p);
+
+  // These labels describe CURRENT-PICK VALUE, not player quality.
+  // Calibrated to the observed draft-value distribution:
+  // +3.0+ = unusually large bargain
+  // +0.5 to +2.99 = meaningful value
+  // -2.0 to +0.49 = reasonable/fair price
+  // below -2.0 = meaningful premium
+  if(v.value>=3) return {label:"🔥 ELITE",cls:"valueElite"};
+  if(v.value>=0.5) return {label:"🟢 STRONG",cls:"valueStrong"};
+  if(v.value>=-2) return {label:"🟡 FAIR",cls:"valueFair"};
+  return {label:"🔴 PREMIUM",cls:"valueReach"};
+}
+
+function vorpAssessment(p){
+  const vorp=Number(p.vorp);
+  if(!Number.isFinite(vorp)) return {label:"—",cls:"vorpNA"};
+  const vals=PLAYERS.filter(x=>Number.isFinite(Number(x.vorp))).map(x=>Number(x.vorp)).sort((a,b)=>a-b);
+  if(!vals.length) return {label:"VORP",cls:"vorpNA"};
+  const pct=vals.filter(v=>v<=vorp).length/vals.length;
+  if(pct>=0.90) return {label:"🔥",cls:"vorpElite"};
+  if(pct>=0.70) return {label:"🟢",cls:"vorpStrong"};
+  if(pct>=0.40) return {label:"🟡",cls:"vorpFair"};
+  return {label:"🔴",cls:"vorpLow"};
+}
+
+function nextOwnPick(){
+  let n=Math.max(1,Number(state.pick)||1)+1;
+  while(n<state.pick+30 && slotForPick(n)!==TEAMS.indexOf(MY_TEAM)+1) n++;
+  return n;
+}
+function erf(x){
+  const sign=x<0?-1:1, a=Math.abs(x), t=1/(1+0.3275911*a);
+  const y=1-((((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t)*Math.exp(-a*a);
+  return sign*y;
+}
+function normalCDF(z){return 0.5*(1+erf(z/Math.SQRT2));}
+function nextPickAvailability(p){
+  const now=Math.max(1,Number(state.pick)||1);
+  const next=nextOwnPick();
+  const adp=Number(p.adp);
+  if(!Number.isFinite(adp)||adp<=0) return {next,pct:null,pctText:"—",cls:"availMed",model:"No ADP"};
+
+  // Version 24: estimate the player's draft-position distribution instead of
+  // treating ADP as a deterministic pick. Prefer an actual ADP standard
+  // deviation when the live snapshot supplies one; otherwise use the
+  // published high/low range (range/4) and finally a conservative ADP-based
+  // fallback. Because the player is available now, condition on X > now.
+  let sigma=Number(p.adpStdDev);
+  let source="ADP spread";
+  if(!Number.isFinite(sigma)||sigma<=0){
+    const hi=Number(p.high), lo=Number(p.low);
+    if(Number.isFinite(hi)&&Number.isFinite(lo)&&hi>lo){ sigma=(hi-lo)/4; source="high/low range"; }
+  }
+  if(!Number.isFinite(sigma)||sigma<=0){
+    sigma=Math.max(2.5,Math.min(14,adp*0.25));
+    source="estimated spread";
+  }
+  sigma=Math.max(1.5,Math.min(18,sigma));
+
+  const survNow=1-normalCDF((now-adp)/sigma);
+  const survNext=1-normalCDF((next-adp)/sigma);
+  const pct=Math.max(0,Math.min(1,survNext/Math.max(0.001,survNow)));
+  const cls=pct>=0.90?"availHigh":pct>=0.65?"availMed":pct>=0.35?"availLow":"availVeryLow";
+  const label=pct>=0.90?"Very likely":pct>=0.65?"Likely":pct>=0.35?"Coin flip":"Unlikely";
+  return {next,pct,pctText:Math.round(pct*100)+"%",cls,label,source,sigma};
+}
+
+function playerSnapshot(p){
+  const v=draftValue(p), pr=positionalRank(p);
+  const cv=(v.consensusValue>=0?"+":"")+v.consensusValue.toFixed(0);
+  const av=v.adpValue===null?"—":(v.adpValue>=0?"+":"")+v.adpValue.toFixed(1);
+  const adpText=v.adp>0?v.adp.toFixed(1):"—";
+  const dv=(v.value>=0?"+":"")+v.value.toFixed(1);
+  const vorp=Number.isFinite(Number(p.vorp))?Number(p.vorp).toFixed(1):"—";
+  const label=valueAssessment(p);
+  const va=vorpAssessment(p);
+
+  return `<div class="playerSnapshot">
+    <div class="miniStat"><b>#${v.cr}</b><span>CONSENSUS</span></div>
+    <div class="miniStat"><b>#${athleticPosRank(p)}</b><span>ATHLETIC POS</span></div>
+    <div class="miniStat"><b>${adpText}</b><span>ADP</span></div>
+    <div class="miniStat"><b>${vorp} <em class="vorpDot ${va.cls}">${va.label}</em></b><span>ATHLETIC VORP</span></div>
+    <div class="miniStat"><b class="dualValue">${dv}</b><span>DRAFT VALUE</span></div>
+  </div>
+  <div class="why" style="margin-top:7px;font-size:11px">
+    ADP ${av} • CONS ${cv} • Value at pick ${v.pick}
+  </div>
+  <div class="valueExplain">Draft Value = weighted market value at this exact pick. <b>Positive is good.</b> Athletic tier = positional projection band from the supplied Athletic POS. PROJ. tiers.</div>
+  <span class="valueLabel ${label.cls}">${label.label}</span>
+  ${(()=>{const a=nextPickAvailability(p); return `<div class="availability ${a.cls}"><span>⏭️ NEXT PICK</span><span class="pct">${a.pctText||"—"}</span><span>${a.label||"availability estimate"}</span><span class="availTiny">Pick #${a.next}</span></div><div class="availModel">Estimated from ADP distribution${a.source&&a.source!=="ADP spread"?` • ${a.source}`:""}; conditioned on being available now.</div>`})()}`;
+}
+
+function positionClass(pos){
+  return "pos"+String(pos||"").replace(/[^A-Za-z]/g,"");
+}
+
+// The Athletic POS. PROJ. screenshots supplied by Tyler show these
+// positional tier bands:
+// QB: T1 1-3, T2 4-6, T3 7-16, T4 17-24
+// RB: T1 1-2, T2 3-8, T3 9-18, T4 19-30
+// WR: T1 1-3, T2 4-10, T3 11-28, T4 29-39
+// TE: T1 1-3, T2 4-11, T3 12-19, T4 20-25
+// The next band shown by The Athletic is T5 (blue).
+const ATHLETIC_TIER_BREAKS={
+  QB:[3,6,16,24],
+  RB:[2,8,18,30],
+  WR:[3,10,28,39],
+  TE:[3,11,19,25]
+};
+
+function athleticPosRank(p){
+  const ar=Number(p.athleticPosRank);
+  return Number.isFinite(ar)&&ar>0 ? ar : positionalRank(p);
+}
+
+function athleticTier(p){
+  const breaks=ATHLETIC_TIER_BREAKS[p.pos];
+  if(!breaks) return null;
+  const r=athleticPosRank(p);
+  if(!Number.isFinite(r)||r<=0) return null;
+  if(r<=breaks[0]) return 1;
+  if(r<=breaks[1]) return 2;
+  if(r<=breaks[2]) return 3;
+  if(r<=breaks[3]) return 4;
+  return 5;
+}
+
+function tierClass(t){
+  return t ? "tier"+t : "tierNA";
+}
+
+function tierLabel(p){
+  const t=athleticTier(p);
+  return t ? "T"+t : "—";
+}
+
+function why(p,i){
+ if(i===0) return "BEST OVERALL VALUE: strongest combination of consensus rank, market value, tier strength, and roster fit. This is the player I'd take unless you have a specific reason to pivot.";
+ if(p.pos==="WR") return "Full PPR + your slight WR preference makes this a strong alternative, especially if the player is falling below his market value.";
+ if(p.pos==="RB") return "RB volume and the league's 0.1 points per rushing attempt add floor. Strong option if the value gap is close.";
+ if(p.pos==="TE") return "TE scarcity can create an advantage. Consider him when an elite tier is about to disappear.";
+ if(p.pos==="QB") return "Six-point passing TDs increase QB scoring. Take the elite value when it falls; don't force QB early.";
+ return "Strong value based on your current board and roster.";
+}
+function renderBoard(app){
+ const c=currentClock();
+ app.innerHTML=`<div class="clock"><div class="label">${c.isMine?"🎯 YOUR PICK":"⏱️ ON THE CLOCK"}</div><div class="team">${c.team}</div><div class="detail">Pick ${state.pick} • Round ${c.round} • Draft slot ${c.slot}</div></div>
+ <div class="card"><button class="action undoLast" type="button" onclick="undoLast()">↩️ UNDO LAST PICK</button></div>
+ <div class="card"><div class="sectiontitle">DRAFT BOARD</div>
+ <input class="search" id="search" placeholder="Search player..." oninput="filterBoard()">
+ <div class="why">On your pick, tap <b>I DRAFTED</b>. For an opponent pick, tap <b>TAKEN</b>.</div>
+ </div><div class="card" id="boardList"></div>`;
+ filterBoard();
+}
+function filterBoard(){
+ const q=(document.getElementById("search")?.value||"").toLowerCase();
+ const list=PLAYERS.filter(p=>(p.name+" "+p.pos+" "+p.team).toLowerCase().includes(q) && (state.status[p.name]||"AVAILABLE")==="AVAILABLE")
+   .sort((a,b)=> (a.rank||999)-(b.rank||999)).slice(0,100);
+ const el=document.getElementById("boardList"); if(!el)return;
+ el.innerHTML=list.length?list.map(playerButtons).join(""):"<div class='muted'>No available players match.</div>";
+}
+function renderTeam(app){
+ app.innerHTML=`<div class="clock"><div class="label">YOUR TEAM</div><div class="team">${MY_TEAM}</div><div class="detail">Current pick: ${state.pick} • ${currentTeam()} is on the clock</div></div>
+ <div class="card"><button class="action undoLast" type="button" onclick="undoLast()">↩️ UNDO LAST PICK</button></div>
+ <div class="card"><div class="sectiontitle">MY TEAM</div>
+ <div class="grid"><div class="stat"><b>${state.mine.length}</b>Total</div><div class="stat"><b>${posCount("WR")}</b>WR</div><div class="stat"><b>${posCount("RB")}</b>RB</div></div></div>
+ <div class="card">${state.mine.length?state.mine.map((p,i)=>`<div class="player"><div class="info"><div class="name">${i+1}. ${p.name}</div><small>${p.pos} • ${p.team}</small></div><button class="undo" data-undo-player="${p.name.replaceAll('"','&quot;')}" type="button">UNDO THIS</button></div>`).join(""):"<div class='muted'>Nothing drafted yet.</div>"}</div>
+ <div class="card"><div class="sectiontitle">ROSTER TARGETS</div>${Object.entries(targets()).map(([p,n])=>`<div style="padding:6px 0"><b>${p}</b>: ${posCount(p)} / ${n}</div>`).join("")}</div>`;
+}
+function undoByName(n){let p=PLAYERS.find(x=>x.name===n);if(p)undo(p)}
+function renderLog(app){
+ const c=currentClock();
+ app.innerHTML=`<div class="clock"><div class="label">${c.isMine?"🎯 YOUR PICK":"⏱️ ON THE CLOCK"}</div><div class="team">${c.team}</div><div class="detail">Pick ${state.pick} • Round ${c.round}</div></div>
+ <div class="card"><button class="action undoLast" type="button" onclick="undoLast()">↩️ UNDO LAST PICK</button></div>
+ <div class="card"><div class="sectiontitle">DRAFT LOG</div>
+ <div class="why">Your picks and opponent selections are stored on this iPad.</div>
+ ${state.log.length?state.log.slice().reverse().map(x=>`<div class="player"><div class="info"><div class="name">Pick ${x.pick}: ${x.player}</div><small>${x.team} • ${x.pos}</small></div></div>`).join(""):"<div class='muted' style='margin-top:12px'>No picks logged yet.</div>"}
+ <button class="action" type="button" onclick="resetDraft()">RESET DRAFT</button></div>`;
+}
+
+function renderData(app){
+  const list=PLAYERS.slice().sort((a,b)=>(a.rank||999)-(b.rank||999));
+  app.innerHTML=`<div class="card"><div class="sectiontitle">PLAYER DATA & REFRESH</div>
+  <button class="action" id="refreshDataBtn" type="button" onclick="refreshData(false)">🔄 REFRESH PLAYER DATA</button>
+  <div class="why"><b>Status:</b> ${DATA_STATUS}</div>
+  <div class="why"><b>Data date:</b> ${SNAPSHOT.asOf}. <b>Sources:</b> ${SNAPSHOT.sources}</div><div class="why"><b>The Athletic:</b> VORP and positional rank are loaded from <b>athletic_latest.json</b>. Athletic tier bands are mapped from the POS. PROJ. colors/ranges in your supplied screenshots.</div>
+  <div class="why">The app loads <b>latest.json</b> for market data and <b>athletic_latest.json</b> for The Athletic VORP. If either file is unavailable, the other source still works.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="action" style="display:inline-block;text-decoration:none" href="https://www.fantasypros.com/nfl/adp/ppr-overall.php" target="_blank">FantasyPros ADP</a><a class="action" style="display:inline-block;text-decoration:none" href="https://fantasyfootballcalculator.com/adp/ppr" target="_blank">FFC 12-Team ADP</a></div></div><div class="card"><input class="search" id="dataSearch" placeholder="Search player..." oninput="filterData()"></div>
+  <div class="card" id="dataList"></div>`;
+  filterData();
+}
+function filterData(){
+ const q=(document.getElementById("dataSearch")?.value||"").toLowerCase();
+ const list=PLAYERS.filter(p=>(p.name+" "+p.pos+" "+p.team).toLowerCase().includes(q))
+   .sort((a,b)=>(a.rank||999)-(b.rank||999)).slice(0,200);
+ const el=document.getElementById("dataList"); if(!el)return;
+ el.innerHTML=list.map(p=>`<div class="player"><div class="info"><div class="name">${p.rank??"—"}. ${p.name}</div><small>${p.pos} • ${p.team} • ADP ${p.adp??"—"} • Consensus ${consensusRank(p)} • VORP ${Number.isFinite(Number(p.vorp))?Number(p.vorp).toFixed(1):"—"} • Athletic POS #${athleticPosRank(p)} • Tier ${tierLabel(p)}</small></div><span class="tag">${(state.status[p.name]||"AVAILABLE")}</span></div>`).join("");
+}
+
+function resetDraft(){if(confirm("Reset the entire draft?")){localStorage.removeItem(KEY);state={status:{},mine:[],log:[],pick:1};render("pick")}}
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1500)}
+render("pick");
+refreshData(true);
+</script>
+</body>
+</html>
